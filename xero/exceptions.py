@@ -120,6 +120,36 @@ class XeroRateLimitExceeded(XeroException):
         super(XeroRateLimitExceeded, self).__init__(response, payload['oauth_problem_advice'][0])
 
 
+class RateLimitException(XeroException):
+    """Exception if Xero API rate limit reached. New version"""
+
+    @property
+    def headers(self):
+        return self.response.headers if self.response else None
+
+    @property
+    def rate_limit(self):
+        try:
+            return self.headers.get("x-rate-limit-problem")
+        except Exception:
+            return None
+
+    @property
+    def retry_after(self):
+        try:
+            return self.headers.get("retry-after")
+        except Exception:
+            return None
+
+    @property
+    def error_message(self):
+        return "You've exceeded the per {} rate limit".format(self.rate_limit)
+
+    @property
+    def problem(self):
+        return self.error_message
+
+
 class XeroNotAvailable(XeroException):
     # HTTP 503 - Not available
     def __init__(self, response):
