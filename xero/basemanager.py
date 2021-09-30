@@ -11,7 +11,7 @@ from xml.etree.ElementTree import tostring, SubElement, Element
 from .exceptions import (
     XeroBadRequest, XeroExceptionUnknown, XeroForbidden, XeroInternalError,
     XeroNotAvailable, XeroNotFound, XeroNotImplemented, XeroRateLimitExceeded,
-    XeroUnauthorized, XeroTenantIdNotSet
+    XeroUnauthorized, XeroTenantIdNotSet, RateLimitException
 )
 from .utils import singular, isplural, json_load_object_hook
 from .auth import OAuth2Credentials
@@ -217,6 +217,10 @@ class BaseManager(object):
 
             elif response.status_code == 404:
                 raise XeroNotFound(response)
+
+            elif response.status_code == 429:
+                # auth2 realisation
+                raise RateLimitException(response)
 
             elif response.status_code == 500:
                 raise XeroInternalError(response)
