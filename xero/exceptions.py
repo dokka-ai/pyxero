@@ -15,6 +15,16 @@ class XeroNotVerified(Exception):
     pass
 
 
+class XeroAccessDenied(Exception):
+    # Access was denied
+    pass
+
+
+class XeroTenantIdNotSet(Exception):
+    # Tenant Id must be set for OAuth2 credentials
+    pass
+
+
 class XeroBadRequest(XeroException):
     # HTTP 400: Bad Request
     def __init__(self, response):
@@ -108,6 +118,36 @@ class XeroRateLimitExceeded(XeroException):
             return super(XeroRateLimitExceeded, self).__init__(response, response.text)
         self.problem = self.errors[0]
         super(XeroRateLimitExceeded, self).__init__(response, payload['oauth_problem_advice'][0])
+
+
+class RateLimitException(XeroException):
+    """Exception if Xero API rate limit reached. New version"""
+
+    @property
+    def headers(self):
+        return self.response.headers if self.response else None
+
+    @property
+    def rate_limit(self):
+        try:
+            return self.headers.get("x-rate-limit-problem")
+        except Exception:
+            return None
+
+    @property
+    def retry_after(self):
+        try:
+            return self.headers.get("retry-after")
+        except Exception:
+            return None
+
+    @property
+    def error_message(self):
+        return "You've exceeded the per {} rate limit".format(self.rate_limit)
+
+    @property
+    def problem(self):
+        return self.error_message
 
 
 class XeroNotAvailable(XeroException):

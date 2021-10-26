@@ -13,3 +13,6 @@ _build
 distribute-*
 .venv
 .idea
+venv/
+env/
+.vscode/
