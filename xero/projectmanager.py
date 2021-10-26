@@ -9,7 +9,7 @@ from .constants import XERO_PROJECTS_URL
 from .exceptions import (
     XeroBadRequest, XeroExceptionUnknown, XeroForbidden, XeroInternalError,
     XeroNotAvailable, XeroNotFound, XeroNotImplemented, XeroRateLimitExceeded,
-    XeroUnauthorized, XeroUnsupportedMediaType
+    XeroUnauthorized, XeroUnsupportedMediaType, RateLimitException
 )
 
 
@@ -84,6 +84,10 @@ class ProjectManager(object):
 
             elif response.status_code == 415:
                 raise XeroUnsupportedMediaType(response)
+
+            elif response.status_code == 429:
+                # auth2 realisation
+                raise RateLimitException(response)
 
             elif response.status_code == 500:
                 raise XeroInternalError(response)
