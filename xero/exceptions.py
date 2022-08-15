@@ -86,10 +86,12 @@ class XeroNotFound(XeroException):
     def __init__(self, response):
         super(XeroNotFound, self).__init__(response, response.text)
 
+
 class XeroUnsupportedMediaType(XeroException):
     # HTTP 415: UnsupportedMediaType
     def __init__(self, response):
         super(XeroUnsupportedMediaType, self).__init__(response, response.text)
+
 
 class XeroInternalError(XeroException):
     # HTTP 500: Internal Error
@@ -125,7 +127,7 @@ class RateLimitException(XeroException):
 
     @property
     def headers(self):
-        return self.response.headers if self.response else None
+        return self.response.headers if self.response is not None else None
 
     @property
     def rate_limit(self):
