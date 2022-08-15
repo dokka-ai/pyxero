@@ -125,6 +125,9 @@ class XeroRateLimitExceeded(XeroException):
 class RateLimitException(XeroException):
     """Exception if Xero API rate limit reached. New version"""
 
+    def __str__(self):
+        return self.error_message
+
     @property
     def headers(self):
         return self.response.headers if self.response is not None else None
