@@ -34,6 +34,7 @@ OBJECT_NAMES = {
     "Invoices": "Invoice",
     "Items": "Item",
     "Journals": "Journal",
+    "LinkedTransactions": "LinkedTransaction",
     "LeaveAccrualLines": "LeaveAccrualLine",
     "LeaveBalances": "LeaveBalance",
     "LeaveLines": "LeaveLine",
