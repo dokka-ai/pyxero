@@ -280,6 +280,36 @@ class ManagerTest(unittest.TestCase):
             {'where': 'Name.ToLower()=="test contact"&&Status=="VOIDED"'}
         )
 
+    def test_filter_pagesize(self):
+        """pageSize should be forwarded as a query param, not a where predicate"""
+        credentials = Mock(base_url="")
+        manager = Manager('invoices', credentials)
+
+        # pageSize alone — should appear in params, not in where
+        uri, params, method, body, headers, singleobject = manager._filter(
+            page=1,
+            pageSize=1000,
+        )
+        self.assertEqual(params, {"page": 1, "pageSize": 1000})
+
+        # pageSize combined with a filter predicate — both should coexist correctly
+        uri, params, method, body, headers, singleobject = manager._filter(
+            page=2,
+            pageSize=500,
+            Status="DRAFT",
+        )
+        self.assertEqual(
+            params,
+            {"page": 2, "pageSize": 500, "where": 'Status=="DRAFT"'},
+        )
+
+        # Omitting pageSize should not affect existing behaviour
+        uri, params, method, body, headers, singleobject = manager._filter(
+            page=3,
+        )
+        self.assertEqual(params, {"page": 3})
+        self.assertNotIn("pageSize", params)
+
     def test_boolean_filter(self):
         """The filter function should correctly handle various arguments"""
         credentials = Mock(base_url="")
